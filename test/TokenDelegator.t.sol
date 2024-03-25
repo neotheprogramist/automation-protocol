@@ -3,13 +3,13 @@ pragma solidity ^0.8.13;
 
 import "forge-std/Test.sol";
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import {TokenDelegator} from "../src/TokenDelegator.sol";
+import {TokenDelegator} from "src/TokenDelgator.sol";
 
 interface IMintableERC20 is IERC20 {
     function mint(address to, uint256 amount) external returns (bool);
 }
 
-contract MyContractTest is Test {
+contract TokenDelegatorTest is Test {
     TokenDelegator public tokenDelegator;
     IMintableERC20 public token;
     address public user;
