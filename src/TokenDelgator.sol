@@ -16,7 +16,7 @@ contract TokenDelegator {
         address _to,
         uint256 _amount
     ) public {
-        require(approvals[msg.sender][_from], "You do not have approval to operate this wallet");
-        token.transferFrom(_from, _to, _amount);
+        token.transferFrom(_from, address(this), _amount);
+        token.transfer(_to, _amount);
     }
 }
