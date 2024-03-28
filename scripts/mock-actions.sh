@@ -107,7 +107,7 @@ fi
 print "\nStarting transfer USDC from rich wallet to our wallet from anvil..."
 
 # Transfer USDC_TRANSFER_AMOUNT USDC from account to our Avil wallet.
-cast send $USDC_CONTRACT_ADDRESS --from $UNLUCKY_USER_USDC_WALLET_ADDRESS "transfer(address,uint256)(bool)" $FIRST_ANVIL_WALLET_ADDRESS $USDC_TRANSFER_AMOUNT --unlocked > "$CAST_SEND_OUTPUT_FILE_PATH" 2>&1
+cast send $USDC_CONTRACT_ADDRESS --from $UNLUCKY_USER_USDC_WALLET_ADDRESS "transfer(address,uint256)(bool)" "$FIRST_ANVIL_WALLET_ADDRESS" $USDC_TRANSFER_AMOUNT --unlocked > "$CAST_SEND_OUTPUT_FILE_PATH" 2>&1
 
 # Check if cast send output has CAST_SEND_SUCCESS_RESPONSE_PARAM param.
 if grep -q "$CAST_SEND_SUCCESS_RESPONSE_PARAM" "$CAST_SEND_OUTPUT_FILE_PATH"; then
