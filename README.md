@@ -1,17 +1,24 @@
-## Foundry
+# automation-protocol
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## Setup
 
-Foundry consists of:
+Create `.env` (public values) and `.env.local` (secret values) files in root directory with templates below:
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+```
+# .env file
 
-## Documentation
+USDC_CONTRACT_ADDRESS=
+FIRST_ANVIL_WALLET_ADDRESS_ALICE=
+UNLUCKY_USER_USDC_WALLET_ADDRESS=
+```
 
-https://book.getfoundry.sh/
+```
+# .env.local file
+
+ALCHEMY_PRIVATE_API_KEY=
+```
+
+## Run
 
 ## Usage
 
@@ -64,3 +71,7 @@ $ forge --help
 $ anvil --help
 $ cast --help
 ```
+
+## Documentation
+
+https://book.getfoundry.sh/

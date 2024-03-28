@@ -13,3 +13,7 @@ docs/
 
 # Dotenv file
 .env
+.env.local
+
+# Scripts tmp files
+/scripts-tmp
