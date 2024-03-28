@@ -40,8 +40,7 @@ if [ "${CI:-false}" = "false" ]; then
   done < "${ENV_LOCAL_FILE_PATH}"
 fi
 
-# Verify if `scripts-tmp` directory already exists,
-# if not, create it.
+# Verify if `scripts-tmp` directory already exists, if not, create it.
 if [ ! -d "$SCRIPTS_TMP_DIR_PATH" ]; then
   mkdir -p "$SCRIPTS_TMP_DIR_PATH"
 fi

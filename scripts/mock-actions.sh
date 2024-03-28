@@ -73,7 +73,6 @@ fi
 
 # Searches for all occurrences of patterns that match a private key (starting with 0x followed by 64 hexadecimal characters).
 # Stop after the first match.
-# FIRST_ANVIL_WALLET_PRIVATE_KEY=$(grep -o '0x[a-fA-F0-9]\{64\}' ${FORK_OUTPUT_FILE_PATH} | head -n 1)
 FIRST_ANVIL_WALLET_PRIVATE_KEY=$(awk '/Private Keys/{flag=1; next} /Wallet/{flag=0} flag && /^\([0-9]+\)/{print $2; exit}' "$FORK_OUTPUT_FILE_PATH")
 
 # Check if we successfully extracted a private key.
@@ -84,10 +83,10 @@ fi
 
 print "Starting impersonate rich account..."
 
-# Impersonate rich account with high number of USDC
+# Impersonate rich account with high number of USDC.
 cast_output=$(cast rpc anvil_impersonateAccount $UNLUCKY_USER_USDC_WALLET_ADDRESS)
 
-# Trim whitespace from the output for a more accurate comparison
+# Trim whitespace from the output for a more accurate comparison.
 trimmed_cast_output=$(echo "$cast_output" | xargs)
 
 # Verify impersonate account commend result.
@@ -98,8 +97,7 @@ else
   print "$trimmed_cast_output"
 fi
 
-# Verify if `scripts-tmp` directory already exists,
-# if not, create it.
+# Verify if `scripts-tmp` directory already exists, if not, create it.
 if [ ! -d "$SCRIPTS_TMP_DIR_PATH" ]; then
   mkdir -p "$SCRIPTS_TMP_DIR_PATH"
 fi
