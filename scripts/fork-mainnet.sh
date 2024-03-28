@@ -11,6 +11,7 @@ ANVIL_FORK_FILE_LINE_CONDITION="Listening on 127.0.0.1:"
 SCRIPT_DIR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 ROOT_DIR_PATH="${SCRIPT_DIR_PATH}/.."
 SCRIPTS_TMP_DIR_PATH="${ROOT_DIR_PATH}/scripts-tmp"
+FORK_OUTPUT_FILE_PATH="${SCRIPTS_TMP_DIR_PATH}/${ANVIL_OUTPUT_FILE}"
 
 # Check if the CI environment variable exists - if not, set default value to `false`,
 # if yes, check if it is set to `false`, which determines that we run script locally
@@ -45,18 +46,17 @@ if [ ! -d "$SCRIPTS_TMP_DIR_PATH" ]; then
   mkdir -p "$SCRIPTS_TMP_DIR_PATH"
 fi
 
-# Start the process in the background and redirect output to a file descriptor.
-exec {FD}>"${SCRIPTS_TMP_DIR_PATH}/${ANVIL_OUTPUT_FILE}"
-
+# Create flag for saving lines to file.
 ANVIL_CONTINUE_SAVE_TO_FILE=true
 
+# Fork main net.
 anvil --fork-url "https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_PRIVATE_API_KEY}" --block-time "$BLOCK_TIME" | while IFS= read -r line; do
   # Always output to console.
   echo "$line"
   
   # Conditional logging to file based on flag.
   if [[ "$ANVIL_CONTINUE_SAVE_TO_FILE" == true ]]; then
-    echo "$line" > /dev/fd/$FD
+    echo "$line" >> "$FORK_OUTPUT_FILE_PATH"
   fi
   
   # Check condition to stop logging to file.
