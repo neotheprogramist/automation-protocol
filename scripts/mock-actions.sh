@@ -2,7 +2,11 @@
 
 set -euo pipefail
 
+FIRST_ANVIL_WALLET_ADDRESS=
+FIRST_ANVIL_WALLET_PRIVATE_KEY=
+
 USDC_TRANSFER_AMOUNT=5000
+ANVIL_OUTPUT_FILE=anvil-fork-output.txt
 CAST_SEND_OUTPUT_FILE=cast-send-output.txt
 CAST_SEND_SUCCESS_RESPONSE_PARAM=blockHash
 FORGE_CREATE_OUTPUT_FILE=forge-create-output.txt
@@ -13,6 +17,7 @@ ANVIL_PORT=8545
 SCRIPT_DIR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 ROOT_DIR_PATH="${SCRIPT_DIR_PATH}/.."
 SCRIPTS_TMP_DIR_PATH="${ROOT_DIR_PATH}/scripts-tmp"
+FORK_OUTPUT_FILE_PATH="${SCRIPTS_TMP_DIR_PATH}/${ANVIL_OUTPUT_FILE}"
 CAST_SEND_OUTPUT_FILE_PATH="${SCRIPTS_TMP_DIR_PATH}/${CAST_SEND_OUTPUT_FILE}"
 FORGE_CREATE_OUTPUT_FIILE_PATH="${SCRIPTS_TMP_DIR_PATH}/${FORGE_CREATE_OUTPUT_FILE}"
 
@@ -49,6 +54,34 @@ if [ "${CI:-false}" = "false" ]; then
   done < "${ENV_FILE_PATH}"
 fi
 
+# Check if `fork-mainnet.sh` was run before (by validating anvil-fork-output.txt file).
+if [ ! -f "$FORK_OUTPUT_FILE_PATH" ]; then
+    print "Please run fork-mainnet.sh script before running this one. Exiting."
+    exit 1
+fi
+
+# Parse file line by line and set flag to 1 when "Available Accounts" are encountered
+# and set flag to 0 when "Private Keys" are encountered and stop processing.
+# If flag is set and line starts with a number in parentheses - print the second field (the account address).
+FIRST_ANVIL_WALLET_ADDRESS=$(awk '/Available Accounts/{flag=1; next} /Private Keys/{flag=0} flag && /^\([0-9]+\)/{print $2; exit}' "$FORK_OUTPUT_FILE_PATH")
+
+# Check if we successfully extracted an address.
+if [ ! -n "${FIRST_ANVIL_WALLET_ADDRESS}" ]; then
+    print "Unable to find a wallet address in the ${FORK_OUTPUT_FILE_PATH} file."
+    exit 1
+fi
+
+# Searches for all occurrences of patterns that match a private key (starting with 0x followed by 64 hexadecimal characters).
+# Stop after the first match.
+# FIRST_ANVIL_WALLET_PRIVATE_KEY=$(grep -o '0x[a-fA-F0-9]\{64\}' ${FORK_OUTPUT_FILE_PATH} | head -n 1)
+FIRST_ANVIL_WALLET_PRIVATE_KEY=$(awk '/Private Keys/{flag=1; next} /Wallet/{flag=0} flag && /^\([0-9]+\)/{print $2; exit}' "$FORK_OUTPUT_FILE_PATH")
+
+# Check if we successfully extracted a private key.
+if [ ! -n "${FIRST_ANVIL_WALLET_PRIVATE_KEY}" ]; then
+    print "Unable to find a wallet private key in the ${FORK_OUTPUT_FILE_PATH} file."
+    exit 1
+fi
+
 print "Starting impersonate rich account..."
 
 # Impersonate rich account with high number of USDC
@@ -74,7 +107,7 @@ fi
 print "\nStarting transfer USDC from rich wallet to our wallet from anvil..."
 
 # Transfer USDC_TRANSFER_AMOUNT USDC from account to our Avil wallet.
-cast send $USDC_CONTRACT_ADDRESS --from $UNLUCKY_USER_USDC_WALLET_ADDRESS "transfer(address,uint256)(bool)" $FIRST_ANVIL_WALLET_ADDRESS_ALICE $USDC_TRANSFER_AMOUNT --unlocked > "$CAST_SEND_OUTPUT_FILE_PATH" 2>&1
+cast send $USDC_CONTRACT_ADDRESS --from $UNLUCKY_USER_USDC_WALLET_ADDRESS "transfer(address,uint256)(bool)" $FIRST_ANVIL_WALLET_ADDRESS $USDC_TRANSFER_AMOUNT --unlocked > "$CAST_SEND_OUTPUT_FILE_PATH" 2>&1
 
 # Check if cast send output has CAST_SEND_SUCCESS_RESPONSE_PARAM param.
 if grep -q "$CAST_SEND_SUCCESS_RESPONSE_PARAM" "$CAST_SEND_OUTPUT_FILE_PATH"; then
@@ -86,7 +119,7 @@ fi
 print "\nDeploying smart contract on fork network...\n"
 
 # Deploy smart contract on fork network.
-forge create --rpc-url "http://localhost:${ANVIL_PORT}" --private-key 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d src/TokenDelgator.sol:TokenDelegator | tee "$FORGE_CREATE_OUTPUT_FIILE_PATH"
+forge create --rpc-url "http://localhost:${ANVIL_PORT}" --private-key "$FIRST_ANVIL_WALLET_PRIVATE_KEY" src/TokenDelgator.sol:TokenDelegator | tee "$FORGE_CREATE_OUTPUT_FIILE_PATH"
 
 # Check if forge create output has FORGE_CREATE_SUCCESS_RESPONSE_PARAM param.
 if grep -q "$FORGE_CREATE_SUCCESS_RESPONSE_PARAM" "$FORGE_CREATE_OUTPUT_FIILE_PATH"; then

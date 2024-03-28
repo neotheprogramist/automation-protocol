@@ -3,7 +3,7 @@
 set -euo pipefail
 
 BLOCK_TIME=10
-ANVIL_OUTPUT_FILE=avil-fork-output.txt
+ANVIL_OUTPUT_FILE=anvil-fork-output.txt
 # Condition after which we're stopping recording lines to file.
 ANVIL_FORK_FILE_LINE_CONDITION="Listening on 127.0.0.1:"
 

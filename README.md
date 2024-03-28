@@ -8,7 +8,6 @@ Create `.env` (public values) and `.env.local` (secret values) files in root dir
 # .env file
 
 USDC_CONTRACT_ADDRESS=
-FIRST_ANVIL_WALLET_ADDRESS_ALICE=
 UNLUCKY_USER_USDC_WALLET_ADDRESS=
 ```
 
@@ -20,7 +19,17 @@ ALCHEMY_PRIVATE_API_KEY=
 
 ## Run
 
-## Usage
+Firstly, run script to fork mainnet (you need to have this script running):
+
+```bash
+./scripts/fork-mainnet.sh
+```
+
+Next step will make all mock actions (impersonate rich wallet, make transfers and deploy smart contract):
+
+```bash
+./scripts/mock-actions.sh
+```
 
 ### Build
 
