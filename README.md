@@ -9,12 +9,27 @@ Create `.env` (public values) and `.env.local` (secret values) files in root dir
 
 USDC_CONTRACT_ADDRESS=
 UNLUCKY_USER_USDC_WALLET_ADDRESS=
+BLOCK_NUMBER=
 ```
 
 ```
 # .env.local file
 
 ALCHEMY_PRIVATE_API_KEY=
+```
+
+## Installation
+
+Install [`getfoundry`](https://book.getfoundry.sh/getting-started/installation) CLI:
+
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+```
+
+Install the latest precompiled binaries (`forge`, `cast`, `anvil`):
+
+```bash
+foundryup
 ```
 
 ## Run

@@ -50,7 +50,7 @@ fi
 ANVIL_CONTINUE_SAVE_TO_FILE=true
 
 # Fork main net.
-anvil --fork-url "https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_PRIVATE_API_KEY}" --block-time "$BLOCK_TIME" | while IFS= read -r line; do
+anvil --fork-url "https://eth-mainnet.g.alchemy.com/v2/${ALCHEMY_PRIVATE_API_KEY}" --fork-block-number "$BLOCK_NUMBER" --block-time "$BLOCK_TIME" | while IFS= read -r line; do
   # Always output to console.
   echo "$line"
   
