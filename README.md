@@ -41,15 +41,15 @@ Install the latest precompiled binaries (`forge`, `cast`, `anvil`):
 foundryup
 ```
 
-## Run
-
-Firstly, install required dependencies:
+Install all protocol required dependencies:
 
 ```bash
 forge install
 ```
 
-Run script to fork mainnet (you need to have this script running):
+## Run
+
+Firstly, run script to fork mainnet (you need to have this script running):
 
 ```bash
 ./scripts/fork-mainnet.sh
