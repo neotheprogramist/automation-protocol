@@ -7,9 +7,17 @@ Create `.env` (public values) and `.env.local` (secret values) files in root dir
 ```
 # .env file
 
-USDC_CONTRACT_ADDRESS=
-UNLUCKY_USER_USDC_WALLET_ADDRESS=
-BLOCK_NUMBER=
+# USDC contract address
+USDC_CONTRACT_ADDRESS=0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48
+
+# Rich USDC wallet address
+UNLUCKY_USER_USDC_WALLET_ADDRESS=0x28C6c06298d514Db089934071355E5743bf21d60
+
+# Amount of USDC on unlucky user wallet
+UNLUCKY_USER_USDC_TRANSFER_AMOUNT=570639343061169
+
+# Ethereum mainnet fork block number
+BLOCK_NUMBER=19591777
 ```
 
 ```
@@ -45,6 +53,8 @@ Next step will make all mock actions (impersonate rich wallet, make transfers an
 ```bash
 ./scripts/mock-actions.sh
 ```
+
+## Commands
 
 ### Build
 

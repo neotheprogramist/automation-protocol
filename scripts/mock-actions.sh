@@ -5,7 +5,6 @@ set -euo pipefail
 FIRST_ANVIL_WALLET_ADDRESS=
 FIRST_ANVIL_WALLET_PRIVATE_KEY=
 
-USDC_TRANSFER_AMOUNT=570639343061169
 ANVIL_OUTPUT_FILE=anvil-fork-output.txt
 CAST_SEND_OUTPUT_FILE=cast-send-output.txt
 CAST_SEND_SUCCESS_RESPONSE_PARAM=blockHash
@@ -56,7 +55,7 @@ fi
 
 # Check if `fork-mainnet.sh` was run before (by validating anvil-fork-output.txt file).
 if [ ! -f "$FORK_OUTPUT_FILE_PATH" ]; then
-    print "Please run fork-mainnet.sh script before running this one. Exiting."
+    print "Please run fork-mainnet.sh script before running this one. Exiting..."
     exit 1
 fi
 
@@ -67,7 +66,7 @@ FIRST_ANVIL_WALLET_ADDRESS=$(awk '/Available Accounts/{flag=1; next} /Private Ke
 
 # Check if we successfully extracted an address.
 if [ ! -n "${FIRST_ANVIL_WALLET_ADDRESS}" ]; then
-    print "Unable to find a wallet address in the ${FORK_OUTPUT_FILE_PATH} file."
+    print "Unable to find a wallet address in the ${FORK_OUTPUT_FILE_PATH} file. Exiting..."
     exit 1
 fi
 
@@ -77,7 +76,7 @@ FIRST_ANVIL_WALLET_PRIVATE_KEY=$(awk '/Private Keys/{flag=1; next} /Wallet/{flag
 
 # Check if we successfully extracted a private key.
 if [ ! -n "${FIRST_ANVIL_WALLET_PRIVATE_KEY}" ]; then
-    print "Unable to find a wallet private key in the ${FORK_OUTPUT_FILE_PATH} file."
+    print "Unable to find a wallet private key in the ${FORK_OUTPUT_FILE_PATH} file. Exiting..."
     exit 1
 fi
 
@@ -95,6 +94,8 @@ if [ "$trimmed_cast_output" = "null" ]; then
 else
   print "Impersonate rich account failed, command output below:"
   print "$trimmed_cast_output"
+  print "Exiting..."
+  exit 1
 fi
 
 # Verify if `scripts-tmp` directory already exists, if not, create it.
@@ -104,14 +105,18 @@ fi
 
 print "\nStarting transfer USDC from rich wallet to our wallet from anvil..."
 
-# Transfer USDC_TRANSFER_AMOUNT USDC from account to our Avil wallet.
-cast send $USDC_CONTRACT_ADDRESS --from $UNLUCKY_USER_USDC_WALLET_ADDRESS "transfer(address,uint256)(bool)" "$FIRST_ANVIL_WALLET_ADDRESS" $USDC_TRANSFER_AMOUNT --unlocked > "$CAST_SEND_OUTPUT_FILE_PATH" 2>&1
+# Disable exit on non-zero status.
+set +e
+
+# Transfer UNLUCKY_USER_USDC_TRANSFER_AMOUNT USDC from account to our Avil wallet.
+cast send $USDC_CONTRACT_ADDRESS --from $UNLUCKY_USER_USDC_WALLET_ADDRESS "transfer(address,uint256)(bool)" "$FIRST_ANVIL_WALLET_ADDRESS" $UNLUCKY_USER_USDC_TRANSFER_AMOUNT --unlocked > "$CAST_SEND_OUTPUT_FILE_PATH" 2>&1
 
 # Check if cast send output has CAST_SEND_SUCCESS_RESPONSE_PARAM param.
 if grep -q "$CAST_SEND_SUCCESS_RESPONSE_PARAM" "$CAST_SEND_OUTPUT_FILE_PATH"; then
-    print "Successfully transfered ${USDC_TRANSFER_AMOUNT} USDC to anvil wallet."
+    print "Successfully transfered ${UNLUCKY_USER_USDC_TRANSFER_AMOUNT} USDC to anvil wallet."
 else
-    print "USDC transfer to anvil wallet failed, check log details in ${CAST_SEND_OUTPUT_FILE_PATH}."
+    print "USDC transfer to anvil wallet failed, check log details in ${CAST_SEND_OUTPUT_FILE_PATH}. Exiting..."
+    exit 1
 fi
 
 print "\nDeploying smart contract on fork network...\n"
@@ -123,5 +128,6 @@ forge create --rpc-url "http://localhost:${ANVIL_PORT}" --private-key "$FIRST_AN
 if grep -q "$FORGE_CREATE_SUCCESS_RESPONSE_PARAM" "$FORGE_CREATE_OUTPUT_FIILE_PATH"; then
     print "\nSuccessfully deployed smart contract on fork network."
 else
-    print "\nSmart contract deployment on fork network failed."
+    print "\nSmart contract deployment on fork network failed. Exiting..."
+    exit 1
 fi
