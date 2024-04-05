@@ -23,6 +23,7 @@ BLOCK_NUMBER=19591777
 ```
 # .env.local file
 
+# Alchemy API key
 ALCHEMY_PRIVATE_API_KEY=
 ```
 
