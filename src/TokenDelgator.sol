@@ -9,6 +9,10 @@ contract TokenDelegator {
     function approve(address _user) public {
         approvals[_user][msg.sender] = true;
     }
+    
+    function allowance(address _owner, address _spender) public view returns (bool) {
+        return approvals[_owner][_spender];
+    }
 
     function transferToken(
         IERC20 token,
@@ -16,6 +20,7 @@ contract TokenDelegator {
         address _to,
         uint256 _amount
     ) public {
+        require(approvals[_from][msg.sender], "TokenDelegator: not approved");
         token.transferFrom(_from, address(this), _amount);
         token.transfer(_to, _amount);
     }
