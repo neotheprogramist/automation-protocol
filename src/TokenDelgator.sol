@@ -20,7 +20,7 @@ contract TokenDelegator {
         address _to,
         uint256 _amount
     ) public {
-        require(approvals[_from][msg.sender], "TokenDelegator: not approved");
+        require(approvals[msg.sender][_from], "TokenDelegator: not approved");
         token.transferFrom(_from, address(this), _amount);
         token.transfer(_to, _amount);
     }
